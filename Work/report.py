@@ -4,6 +4,7 @@
 import csv
 from fileparse import parse_csv
 import stock
+import tableformat
 
 def read_portfolio(filename):
     '''Opens a given portfolio and reads it into a list of tuples'''
@@ -34,22 +35,29 @@ def compute_change(filename_portfolio, filename_prices):
     
     return report
 
-def visualize_change(report):
+def visualize_change(report, formatter):
+    '''
+    Print a nicely formated table from a list of (name, shares, price, change) tuples.
+    '''
+    #print(f'      Name     Shares      Price     Change')
+    #print(f'---------- ---------- ---------- ----------') 
 
-    print(f'      Name     Shares      Price     Change')
-    print(f'---------- ---------- ---------- ----------') 
-
+    formatter.headings(['Name', 'Shares', 'Price', 'Change'])
     for name, shares, price, change in report:
-        price = '$' + f'{price:.2f}'
-        print(f'{name:>10s} {shares:>10d} {price:>10s} {change:>10.2f}')
+        rowdata = [ name, str(shares), f'{price:0.2f}', f'{change:0.2f}' ]
+        formatter.row(rowdata)
+        #price = '$' + f'{price:.2f}'
+        #print(f'{name:>10s} {shares:>10d} {price:>10s} {change:>10.2f}')
 
-def portfolio_report(portfolio, prices):
+def portfolio_report(portfolio, prices, fmt):
     portfolio_details = compute_change(portfolio, prices)
-    visualize_change(portfolio_details)
+    
+    formatter = tableformat.create_formatter(fmt)
+    visualize_change(portfolio_details, formatter)
 
 def main(argv):
     print(argv)
-    portfolio_report(argv[1], argv[2])
+    portfolio_report(argv[1], argv[2], argv[3])
 
 if __name__ == '__main__':
     import sys
